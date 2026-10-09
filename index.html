@@ -79,7 +79,7 @@
             <!-- Ganador -->
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-3xl p-8 text-center text-white shadow-2xl mb-8 border-4 border-white">
                 <h2 class="text-5xl font-bold font-cuento mb-4">¡ES OFICIAL! 🎉</h2>
-                <p id="texto-oficial" class="text-2xl mb-6"></p>
+                <p class="text-2xl mb-6">Valery estará en nuestro hogar el <span class="font-black text-yellow-300">27 de Noviembre</span></p>
                 <div id="resultado-ganador" class="bg-white/20 p-4 rounded-xl text-xl backdrop-blur-sm">
                     <!-- Mensaje del ganador se inyecta aquí -->
                 </div>
@@ -208,7 +208,7 @@
             document.getElementById('resultado-ganador').innerHTML = msj;
 
             const seccionRev = document.getElementById('seccion-revelacion');
-            seccionRev.style.display = 'block'; // Esta es la nueva llave maestra
+            seccionRev.classList.remove('hidden');
             setTimeout(() => {
                 seccionRev.classList.remove('scale-95', 'opacity-0');
                 seccionRev.classList.add('scale-100', 'opacity-100');
@@ -216,15 +216,6 @@
 
             iniciarContador();
             document.getElementById('form-apuesta').parentElement.style.display = 'none';
-
-            // 🚨 AGREGA ESTA LÍNEA AQUÍ PARA REVELAR LA FECHA:
-            document.getElementById('texto-oficial').innerHTML = 'Valery estará en nuestro hogar el <span class="font-black text-yellow-300">27 de Noviembre</span>';
-            
-            const msj = minDiff === 0 
-                ? `¡Increíble! 🏆 ${textoGanador} acertó la fecha EXACTA.` 
-                : `🏆 Más cerca: ${textoGanador} (Diferencia de solo ${minDiff} días)`;
-            
-            document.getElementById('resultado-ganador').innerHTML = msj;
         }
 
         function iniciarContador() {
