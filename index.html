@@ -35,31 +35,30 @@
                 </div>
                 <div class="w-full">
                     <label class="block text-sm font-bold text-gray-700 mb-1">¿Qué día crees que llegará?</label>
-                    <!-- Rango abierto desde hoy 9 de Octubre -->
-                    <input type="date" id="fecha" required min="2026-10-09" max="2026-12-31" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 outline-none">
+                    <input type="date" id="fecha" required min="2026-10-10" max="2027-12-31" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 outline-none">
                 </div>
                 <div class="w-full">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Tu Ícono</label>
                     <select id="icono" class="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-pink-400 outline-none text-xl">
                         <!-- Los tiernos y Clásicos -->
-                        <option value="👶">👶 </option>
-                        <option value="👣">👣 </option>
-                        <option value="🍼">🍼 </option>
-                        <option value="🧸">🧸 </option>
-                        <option value="⭐">⭐ </option>
+                        <option value="👶">👶 Bebé en camino</option>
+                        <option value="👣">👣 Huellitas</option>
+                        <option value="🍼">🍼 Biberón</option>
+                        <option value="🧸">🧸 Osito</option>
+                        <option value="⭐">⭐ Estrella</option>
                         
                         <!-- Las dueñas de la casa -->
-                        <option value="🐈">🐈</option>
-                        <option value="🐾">🐾 </option>
+                        <option value="🐈">🐈 Mila</option>
+                        <option value="🐾">🐾 Niki</option>
                         
                         <!-- La Familia (Humanos) -->
-                        <option value="💃">💃 Tía </option>
+                        <option value="💃">💃 Tía</option>
                         <option value="👵">👵 Abuela</option>
                         <option value="🕶️">🕶️ Tío</option>
                         <option value="👴">👴 Abuelo</option>
                         <option value="🎮">🎮 Primo</option>
                         <option value="💅">💅 Prima</option>
-                                               
+                                                
                     </select>
                 </div>
                 <button type="submit" class="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-md transform hover:scale-105">
@@ -74,15 +73,13 @@
             <!-- Las apuestas aparecerán aquí en tiempo real -->
         </div>
 
-        <!-- SECCIÓN SECRETA DE REVELACIÓN (Seguridad Extrema: Oculta a la fuerza) -->
-        <div id="seccion-revelacion" style="display: none;" class="transform transition-all duration-700 scale-95 opacity-0">
+        <!-- SECCIÓN SECRETA DE REVELACIÓN (Oculta por defecto) -->
+        <div id="seccion-revelacion" class="hidden transform transition-all duration-700 scale-95 opacity-0">
             
             <!-- Ganador -->
             <div class="bg-gradient-to-r from-pink-400 to-purple-500 rounded-3xl p-8 text-center text-white shadow-2xl mb-8 border-4 border-white">
                 <h2 class="text-5xl font-bold font-cuento mb-4">¡ES OFICIAL! 🎉</h2>
-                <!-- El texto oficial está vacío para evitar filtraciones en el código -->
                 <p id="texto-oficial" class="text-2xl mb-6"></p>
-                
                 <div id="resultado-ganador" class="bg-white/20 p-4 rounded-xl text-xl backdrop-blur-sm">
                     <!-- Mensaje del ganador se inyecta aquí -->
                 </div>
@@ -153,4 +150,109 @@
                 card.innerHTML = `
                     <div class="text-4xl mb-2">${data.icono}</div>
                     <div class="font-bold text-gray-800">${data.nombre}</div>
-                    <div class="text
+                    <div class="text-sm text-pink-500 font-bold bg-pink-50 px-2 py-1 rounded mt-1">${formatearFecha(data.fechaString)}</div>
+                `;
+                tablero.appendChild(card);
+            });
+        });
+
+        document.getElementById('form-apuesta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nombre = document.getElementById('nombre').value;
+            const fechaString = document.getElementById('fecha').value;
+            const icono = document.getElementById('icono').value;
+
+            try {
+                await addDoc(apuestasRef, { nombre, fechaString, icono });
+                document.getElementById('form-apuesta').reset();
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
+            } catch (error) {
+                console.error("Error al guardar: ", error);
+                alert("Hubo un error al guardar. Revisa la consola.");
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'L' || event.key === 'l') {
+                revelarGranSecreto();
+            }
+        });
+
+        function revelarGranSecreto() {
+            const duration = 5 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                const particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+
+            const objetivo = new Date(fechaRealLlegada + 'T00:00:00');
+            let apuestasCalculadas = todasLasApuestas.map(a => {
+                const fechaApostada = new Date(a.fechaString + 'T00:00:00');
+                const diffDias = Math.ceil(Math.abs(objetivo - fechaApostada) / (1000 * 60 * 60 * 24));
+                return { ...a, diffDias };
+            });
+
+            const minDiff = Math.min(...apuestasCalculadas.map(a => a.diffDias));
+            const ganadores = apuestasCalculadas.filter(a => a.diffDias === minDiff);
+            const textoGanador = ganadores.map(g => `${g.icono} ${g.nombre}`).join(' y ');
+
+            const msj = minDiff === 0 
+                ? `¡Increíble! 🏆 ${textoGanador} acertó la fecha EXACTA.` 
+                : `🏆 Más cerca: ${textoGanador} (Diferencia de solo ${minDiff} días)`;
+            
+            document.getElementById('resultado-ganador').innerHTML = msj;
+
+            const seccionRev = document.getElementById('seccion-revelacion');
+            seccionRev.style.display = 'block'; // Esta es la nueva llave maestra
+            setTimeout(() => {
+                seccionRev.classList.remove('scale-95', 'opacity-0');
+                seccionRev.classList.add('scale-100', 'opacity-100');
+            }, 50);
+
+            iniciarContador();
+            document.getElementById('form-apuesta').parentElement.style.display = 'none';
+
+            // 🚨 AGREGA ESTA LÍNEA AQUÍ PARA REVELAR LA FECHA:
+            document.getElementById('texto-oficial').innerHTML = 'Valery estará en nuestro hogar el <span class="font-black text-yellow-300">27 de Noviembre</span>';
+            
+            const msj = minDiff === 0 
+                ? `¡Increíble! 🏆 ${textoGanador} acertó la fecha EXACTA.` 
+                : `🏆 Más cerca: ${textoGanador} (Diferencia de solo ${minDiff} días)`;
+            
+            document.getElementById('resultado-ganador').innerHTML = msj;
+        }
+
+        function iniciarContador() {
+            const msLlegada = new Date(fechaRealLlegada + 'T00:00:00').getTime();
+            setInterval(() => {
+                const ahora = new Date().getTime();
+                const distancia = msLlegada - ahora;
+
+                if (distancia < 0) {
+                    document.getElementById('contador-valery').innerHTML = "<h2 class='text-4xl font-bold text-pink-600 animate-bounce p-8'>¡VALERY YA ESTÁ EN CASA! 🏡💖</h2>";
+                    return;
+                }
+
+                document.getElementById('dias').innerText = Math.floor(distancia / (1000 * 60 * 60 * 24));
+                let hrs = Math.floor((distancia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let mns = Math.floor((distancia % (1000 * 60 * 60)) / (1000 * 60));
+                
+                document.getElementById('horas').innerText = hrs < 10 ? '0' + hrs : hrs;
+                document.getElementById('minutos').innerText = mns < 10 ? '0' + mns : mns;
+            }, 1000);
+        }
+
+        function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+        function formatearFecha(fechaStr) {
+            const partes = fechaStr.split('-');
+            const f = new Date(partes[0], partes[1] - 1, partes[2]);
+            return f.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+        }
+    </script>
+</body>
+</html>
