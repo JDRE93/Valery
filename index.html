@@ -208,7 +208,7 @@
             document.getElementById('resultado-ganador').innerHTML = msj;
 
             const seccionRev = document.getElementById('seccion-revelacion');
-            seccionRev.classList.remove('hidden');
+            seccionRev.style.display = 'block'; // Esta es la nueva llave maestra
             setTimeout(() => {
                 seccionRev.classList.remove('scale-95', 'opacity-0');
                 seccionRev.classList.add('scale-100', 'opacity-100');
